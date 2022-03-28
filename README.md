@@ -29,14 +29,9 @@ pclient.NetWorkStateChangedEvent += (state) =>
     Console.WriteLine(state);
 };
 
-pclient.initClient(host, port, () =>
+pclient.initClient(host, port, data =>
 {
-    //The user data is the handshake user params
-    JsonObject user = new JsonObject();
-    pclient.connect(user, data =>
-    {
-     	//process handshake call back data
-    });
+    //process handshake call back data
 });
 
 ```
@@ -54,13 +49,9 @@ var param = new KcpClientParam(
     host, port, conv: 123, nodelay: 1, interval: 20, resend: 2, nc: 1,
     sndwnd: 64, rcvwnd: 64, mtu: 1400
 );
-kcp.initClient(param, () =>
-{
-    kcp.connect(null, data =>
-    {
-        // Console.WriteLine("on data back" + data.ToString());
-        Entry();
-    });
+kcp.initClient(param, data => {
+    // Console.WriteLine("on data back" + data.ToString());
+    Entry();
 });
 ```
 

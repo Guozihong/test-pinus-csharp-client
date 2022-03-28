@@ -58,21 +58,30 @@ namespace Pomelo.DotNetClient
         /// <param name="host">server name or server ip (www.xxx.com/127.0.0.1/::1/localhost etc.)</param>
         /// <param name="port">server port</param>
         /// <param name="callback">socket successfully connected callback(in network thread)</param>
-        public void initClient(KcpClientParam param, Action callback = null)
+        public void initClient(KcpClientParam param, Action<JsonObject> callback = null)
         {
             SetHostAndPort(param.host, param.port);
 
             timeoutEvent.Reset();
-            eventManager = new EventManager();
             NetWorkChanged(NetWorkState.CONNECTING);
 
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             this.socket.Bind(new IPEndPoint(IPAddress.Any, 0));
             // this.socket.ReceiveBufferSize = 65536; // 64KB UDP不会对发送的包进行自动分组，一次发多大，就接收多大，所以要设置的尽量大，否则会报错，无法接收
             this.protocol = new Protocol(this, param, this.socket);
-            if (callback != null)
+            this.connect((obj) => {
+                NetWorkChanged(NetWorkState.CONNECTED);
+                timeoutEvent.Set();
+                callback?.Invoke(obj);
+            });
+
+            if (timeoutEvent.WaitOne(timeoutMSec, false))
             {
-                callback();
+                if (netWorkState != NetWorkState.CONNECTED && netWorkState != NetWorkState.ERROR)
+                {
+                    NetWorkChanged(NetWorkState.TIMEOUT);
+                    Dispose();
+                }
             }
         }
 

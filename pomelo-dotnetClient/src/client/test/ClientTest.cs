@@ -22,13 +22,10 @@ namespace Pomelo.DotNetClient.Test
                 host, port, conv: 123, nodelay: 1, interval: 20, resend: 2, nc: 1,
                 sndwnd: 64, rcvwnd: 64, mtu: 1400
             );
-            kcp.initClient(param, () =>
+            kcp.initClient(param, data =>
             {
-                pc.connect(null, data =>
-                {
-                    // Console.WriteLine("on data back" + data.ToString());
-                    Entry();
-                });
+                // Console.WriteLine("on data back" + data.ToString());
+                Entry();
             });
         }
 
@@ -42,13 +39,10 @@ namespace Pomelo.DotNetClient.Test
                 Console.WriteLine(state);
             };
 
-            pc.initClient(host, port, () =>
+            tcp.initClient(host, port, data =>
             {
-                pc.connect(null, data =>
-                {
-                    // Console.WriteLine("on data back" + data.ToString());
-                    Entry();
-                });
+                // Console.WriteLine("on data back" + data.ToString());
+                Entry();
             });
         }
 
@@ -113,8 +107,8 @@ namespace Pomelo.DotNetClient.Test
             string host = "192.168.10.204";
             int port = 3010;
 
-            kcpTest(host, port);
-            // tcpTest(host, port);
+            //kcpTest(host, port);
+            tcpTest(host, port);
         }
     }
 }

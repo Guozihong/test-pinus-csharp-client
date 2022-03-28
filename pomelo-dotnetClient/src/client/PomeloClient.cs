@@ -52,84 +52,84 @@ namespace Pomelo.DotNetClient
 
         public PomeloClient()
         {
-        }
-
-        /// <summary>
-        /// initialize pomelo client
-        /// </summary>
-        /// <param name="host">server name or server ip (www.xxx.com/127.0.0.1/::1/localhost etc.)</param>
-        /// <param name="port">server port</param>
-        /// <param name="callback">socket successfully connected callback(in network thread)</param>
-        public virtual void initClient(string host, int port, Action callback = null)
-        {
-            timeoutEvent.Reset();
             eventManager = new EventManager();
-            NetWorkChanged(NetWorkState.CONNECTING);
-
-            // IPAddress ipAddress = null;
-
-            //try
-            //{
-            //    IPAddress[] addresses = Dns.GetHostEntry(host).AddressList;
-            //    foreach (var item in addresses)
-            //    {
-            //        if (item.AddressFamily == AddressFamily.InterNetwork)
-            //        {
-            //            ipAddress = item;
-            //            break;
-            //        }
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    NetWorkChanged(NetWorkState.ERROR);
-            //    return;
-            //}
-
-            //if (ipAddress == null)
-            //{
-            //    throw new Exception("can not parse host : " + host);
-            //}
-
-            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint ie = new IPEndPoint(IPAddress.Parse(host), port);
-
-            socket.BeginConnect(ie, new AsyncCallback((result) =>
-            {
-                try
-                {
-                    this.socket.EndConnect(result);
-                    this.protocol = new Protocol(this, this.socket);
-                    NetWorkChanged(NetWorkState.CONNECTED);
-
-                    if (callback != null)
-                    {
-                        callback();
-                    }
-                }
-                catch (SocketException e)
-                {
-                    if (netWorkState != NetWorkState.TIMEOUT)
-                    {
-                        NetWorkChanged(NetWorkState.ERROR);
-                    }
-                    Dispose();
-                }
-                finally
-                {
-                    timeoutEvent.Set();
-                }
-            }), this.socket);
-
-            if (timeoutEvent.WaitOne(timeoutMSec, false))
-            {
-                if (netWorkState != NetWorkState.CONNECTED && netWorkState != NetWorkState.ERROR)
-                {
-                    NetWorkChanged(NetWorkState.TIMEOUT);
-                    Dispose();
-                }
-            }
         }
+
+        ///// <summary>
+        ///// initialize pomelo client
+        ///// </summary>
+        ///// <param name="host">server name or server ip (www.xxx.com/127.0.0.1/::1/localhost etc.)</param>
+        ///// <param name="port">server port</param>
+        ///// <param name="callback">socket successfully connected callback(in network thread)</param>
+        //public virtual void initClient(string host, int port, Action callback = null)
+        //{
+        //    timeoutEvent.Reset();
+        //    NetWorkChanged(NetWorkState.CONNECTING);
+
+        //    IPAddress ipAddress = null;
+
+        //    try
+        //    {
+        //       IPAddress[] addresses = Dns.GetHostEntry(host).AddressList;
+        //       foreach (var item in addresses)
+        //       {
+        //           if (item.AddressFamily == AddressFamily.InterNetwork)
+        //           {
+        //               ipAddress = item;
+        //               break;
+        //           }
+        //       }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //       NetWorkChanged(NetWorkState.ERROR);
+        //       return;
+        //    }
+
+        //    if (ipAddress == null)
+        //    {
+        //       throw new Exception("can not parse host : " + host);
+        //    }
+
+        //    this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //    IPEndPoint ie = new IPEndPoint(ipAddress, port);
+
+        //    socket.BeginConnect(ie, new AsyncCallback((result) =>
+        //    {
+        //        try
+        //        {
+        //            this.socket.EndConnect(result);
+        //            this.protocol = new Protocol(this, this.socket);
+        //            NetWorkChanged(NetWorkState.CONNECTED);
+
+        //            if (callback != null)
+        //            {
+        //                callback();
+        //            }
+        //        }
+        //        catch (SocketException e)
+        //        {
+        //            if (netWorkState != NetWorkState.TIMEOUT)
+        //            {
+        //                NetWorkChanged(NetWorkState.ERROR);
+        //            }
+        //            Dispose();
+        //        }
+        //        finally
+        //        {
+        //            timeoutEvent.Set();
+        //        }
+        //    }), this.socket);
+
+        //    if (timeoutEvent.WaitOne(timeoutMSec, false))
+        //    {
+        //        if (netWorkState != NetWorkState.CONNECTED && netWorkState != NetWorkState.ERROR)
+        //        {
+        //            NetWorkChanged(NetWorkState.TIMEOUT);
+        //            Dispose();
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// 网络状态变化
