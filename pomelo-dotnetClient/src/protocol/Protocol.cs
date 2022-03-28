@@ -12,19 +12,30 @@ namespace Pomelo.DotNetClient
         private HandShakeService handshake;
         private HeartBeatService heartBeatService = null;
         private PomeloClient pc;
+        // private Int64 startT = -1;
 
         public PomeloClient getPomeloClient()
         {
             return this.pc;
         }
 
+        public Protocol(PomeloKcpClient pc, KcpClientParam param, System.Net.Sockets.Socket socket)
+        {
+            this.pc = pc;
+            this.transporter = new KcpTransporter(socket, param, pc.sendIpEndPoint, this.processMessage);
+            this.transporter.onDisconnect = onDisconnect;
+
+            this.handshake = new HandShakeService(this, "1.0.0", "unity-kcp-socket");
+            this.state = ProtocolState.start;
+        }
+        
         public Protocol(PomeloClient pc, System.Net.Sockets.Socket socket)
         {
             this.pc = pc;
-            this.transporter = new Transporter(socket, this.processMessage);
+            this.transporter = new TcpTransporter(socket, this.processMessage);
             this.transporter.onDisconnect = onDisconnect;
 
-            this.handshake = new HandShakeService(this);
+            this.handshake = new HandShakeService(this, "1.0.0", "unity-tcp-socket");
             this.state = ProtocolState.start;
         }
 
@@ -54,6 +65,9 @@ namespace Pomelo.DotNetClient
 
         internal void send(PackageType type)
         {
+            //if (PackageType.PKG_HEARTBEAT == type) {
+            //    startT = GetTimeStamp();
+            //}
             if (this.state == ProtocolState.closed) return;
             transporter.send(PackageProtocol.encode(type));
         }
@@ -68,6 +82,16 @@ namespace Pomelo.DotNetClient
 
             send(type, body);
         }
+
+        ///// <summary>
+        ///// 获取时间戳
+        ///// </summary>
+        ///// <returns></returns>
+        //public Int64 GetTimeStamp()
+        //{
+        //    TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        //    return Convert.ToInt64(ts.TotalMilliseconds);
+        //}
 
         //Send message use the transporter
         internal void send(PackageType type, byte[] body)
@@ -98,6 +122,10 @@ namespace Pomelo.DotNetClient
             }
             else if (pkg.type == PackageType.PKG_HEARTBEAT && this.state == ProtocolState.working)
             {
+                //if (startT != -1) {
+                //    var t = GetTimeStamp() - startT;
+                //    Console.WriteLine($"ping {t / 2}\n");
+                //}
                 this.heartBeatService.resetTimeout();
             }
             else if (pkg.type == PackageType.PKG_DATA && this.state == ProtocolState.working)

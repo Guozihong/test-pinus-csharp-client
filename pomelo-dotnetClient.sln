@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30804.86
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "pomelo-dotnetClient", "pomelo-dotnetClient\pomelo-dotnetClient.csproj", "{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}"
 EndProject
@@ -18,8 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
-		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|Mixed Platforms.ActiveCfg = Release|x86
+		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|Mixed Platforms.Build.0 = Release|x86
 		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|x86.ActiveCfg = Debug|x86
 		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Debug|x86.Build.0 = Debug|x86
 		{0752F53D-46EF-44E2-AAA9-F2FAB9F0C4FA}.Release|Any CPU.ActiveCfg = Release|x86
@@ -40,6 +40,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1162D1CA-B269-470B-9895-AA12EE488143}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = pomelo-dotnetClient\pomelo-dotnetClient.csproj

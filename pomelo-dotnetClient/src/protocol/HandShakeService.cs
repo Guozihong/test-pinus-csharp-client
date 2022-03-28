@@ -11,13 +11,15 @@ namespace Pomelo.DotNetClient
         private Protocol protocol;
         private Action<JsonObject> callback;
 
-        public const string Version = "0.3.0";
-        public const string Type = "unity-socket";
+        public string Version = "1.0.0";
+        public string Type = "unity-socket";
 
 
-        public HandShakeService(Protocol protocol)
+        public HandShakeService(Protocol protocol, string version, string type)
         {
             this.protocol = protocol;
+            this.Version = version;
+            this.Type = type;
         }
 
         public void request(JsonObject user, Action<JsonObject> callback)

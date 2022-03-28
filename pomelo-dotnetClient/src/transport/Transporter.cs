@@ -3,34 +3,28 @@ using System.Net.Sockets;
 
 namespace Pomelo.DotNetClient
 {
-    class StateObject
-    {
-        public const int BufferSize = 1024;
-        internal byte[] buffer = new byte[BufferSize];
-    }
-
     public class Transporter
     {
         public const int HeadLength = 4;
 
-        private Socket socket;
-        private Action<byte[]> messageProcesser;
+        protected Socket socket;
+        protected Action<byte[]> messageProcesser;
 
         //Used for get message
-        private StateObject stateObject = new StateObject();
-        private TransportState transportState;
-        private IAsyncResult asyncReceive;
-        private IAsyncResult asyncSend;
-        private bool onSending = false;
-        private bool onReceiving = false;
-        private byte[] headBuffer = new byte[4];
-        private byte[] buffer;
-        private int bufferOffset = 0;
-        private int pkgLength = 0;
+        protected StateObject stateObject = new StateObject(1024);
+        protected TransportState transportState;
+        protected IAsyncResult asyncReceive;
+        protected IAsyncResult asyncSend;
+        protected bool onSending = false;
+        protected bool onReceiving = false;
+        protected byte[] headBuffer = new byte[4];
+        protected byte[] buffer;
+        protected int bufferOffset = 0;
+        protected int pkgLength = 0;
         internal Action onDisconnect = null;
 
-        //private TransportQueue<byte[]> _receiveQueue = new TransportQueue<byte[]>();
-        private System.Object _lock = new System.Object();
+        //protected TransportQueue<byte[]> _receiveQueue = new TransportQueue<byte[]>();
+        protected System.Object _lock = new System.Object();
 
         public Transporter(Socket socket, Action<byte[]> processer)
         {
@@ -44,7 +38,7 @@ namespace Pomelo.DotNetClient
             this.receive();
         }
 
-        public void send(byte[] buffer)
+        public virtual void send(byte[] buffer)
         {
             if (this.transportState != TransportState.closed)
             {
@@ -60,7 +54,7 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        private void sendCallback(IAsyncResult asyncSend)
+        protected void sendCallback(IAsyncResult asyncSend)
         {
             //UnityEngine.Debug.Log("sendCallback " + this.transportState);
             if (this.transportState == TransportState.closed) return;
@@ -68,7 +62,7 @@ namespace Pomelo.DotNetClient
             this.onSending = false;
         }
 
-        public void receive()
+        public virtual void receive()
         {
             //Console.WriteLine("receive state : {0}, {1}", this.transportState, socket.Available);
             this.asyncReceive = socket.BeginReceive(stateObject.buffer, 0, stateObject.buffer.Length, SocketFlags.None, new AsyncCallback(endReceive), stateObject);
@@ -86,7 +80,7 @@ namespace Pomelo.DotNetClient
             }*/
         }
 
-        private void endReceive(IAsyncResult asyncReceive)
+        protected virtual void endReceive(IAsyncResult asyncReceive)
         {
             if (this.transportState == TransportState.closed)
                 return;
@@ -130,7 +124,7 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        private bool readHead(byte[] bytes, int offset, int limit)
+        protected bool readHead(byte[] bytes, int offset, int limit)
         {
             int length = limit - offset;
             int headNum = HeadLength - bufferOffset;
@@ -160,7 +154,7 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        private void readBody(byte[] bytes, int offset, int limit)
+        protected void readBody(byte[] bytes, int offset, int limit)
         {
             int length = pkgLength + HeadLength - bufferOffset;
             if ((offset + length) <= limit)
@@ -186,12 +180,12 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        private void writeBytes(byte[] source, int start, int length, byte[] target)
+        protected void writeBytes(byte[] source, int start, int length, byte[] target)
         {
             writeBytes(source, start, length, 0, target);
         }
 
-        private void writeBytes(byte[] source, int start, int length, int offset, byte[] target)
+        protected void writeBytes(byte[] source, int start, int length, int offset, byte[] target)
         {
             for (int i = 0; i < length; i++)
             {
@@ -199,7 +193,7 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        private void print(byte[] bytes, int offset, int length)
+        protected void print(byte[] bytes, int offset, int length)
         {
             for (int i = offset; i < length; i++)
                 Console.Write(Convert.ToString(bytes[i], 16) + " ");

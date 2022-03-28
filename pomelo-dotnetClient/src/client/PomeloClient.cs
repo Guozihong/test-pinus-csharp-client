@@ -39,16 +39,16 @@ namespace Pomelo.DotNetClient
         public event Action<NetWorkState> NetWorkStateChangedEvent;
 
 
-        private NetWorkState netWorkState = NetWorkState.CLOSED;   //current network state
+        protected NetWorkState netWorkState = NetWorkState.CLOSED;   //current network state
 
-        private EventManager eventManager;
-        private Socket socket;
-        private Protocol protocol;
-        private bool disposed = false;
-        private uint reqId = 1;
+        protected EventManager eventManager;
+        protected Socket socket;
+        protected Protocol protocol;
+        protected bool disposed = false;
+        protected uint reqId = 1;
 
-        private ManualResetEvent timeoutEvent = new ManualResetEvent(false);
-        private int timeoutMSec = 8000;    //connect timeout count in millisecond
+        protected ManualResetEvent timeoutEvent = new ManualResetEvent(false);
+        protected int timeoutMSec = 8000;    //connect timeout count in millisecond
 
         public PomeloClient()
         {
@@ -60,39 +60,39 @@ namespace Pomelo.DotNetClient
         /// <param name="host">server name or server ip (www.xxx.com/127.0.0.1/::1/localhost etc.)</param>
         /// <param name="port">server port</param>
         /// <param name="callback">socket successfully connected callback(in network thread)</param>
-        public void initClient(string host, int port, Action callback = null)
+        public virtual void initClient(string host, int port, Action callback = null)
         {
             timeoutEvent.Reset();
             eventManager = new EventManager();
             NetWorkChanged(NetWorkState.CONNECTING);
 
-            IPAddress ipAddress = null;
+            // IPAddress ipAddress = null;
 
-            try
-            {
-                IPAddress[] addresses = Dns.GetHostEntry(host).AddressList;
-                foreach (var item in addresses)
-                {
-                    if (item.AddressFamily == AddressFamily.InterNetwork)
-                    {
-                        ipAddress = item;
-                        break;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                NetWorkChanged(NetWorkState.ERROR);
-                return;
-            }
+            //try
+            //{
+            //    IPAddress[] addresses = Dns.GetHostEntry(host).AddressList;
+            //    foreach (var item in addresses)
+            //    {
+            //        if (item.AddressFamily == AddressFamily.InterNetwork)
+            //        {
+            //            ipAddress = item;
+            //            break;
+            //        }
+            //    }
+            //}
+            //catch (Exception e)
+            //{
+            //    NetWorkChanged(NetWorkState.ERROR);
+            //    return;
+            //}
 
-            if (ipAddress == null)
-            {
-                throw new Exception("can not parse host : " + host);
-            }
+            //if (ipAddress == null)
+            //{
+            //    throw new Exception("can not parse host : " + host);
+            //}
 
             this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            IPEndPoint ie = new IPEndPoint(ipAddress, port);
+            IPEndPoint ie = new IPEndPoint(IPAddress.Parse(host), port);
 
             socket.BeginConnect(ie, new AsyncCallback((result) =>
             {
@@ -135,7 +135,7 @@ namespace Pomelo.DotNetClient
         /// 网络状态变化
         /// </summary>
         /// <param name="state"></param>
-        private void NetWorkChanged(NetWorkState state)
+        protected void NetWorkChanged(NetWorkState state)
         {
             netWorkState = state;
 
@@ -174,7 +174,7 @@ namespace Pomelo.DotNetClient
             }
         }
 
-        private JsonObject emptyMsg = new JsonObject();
+        protected JsonObject emptyMsg = new JsonObject();
         public void request(string route, Action<JsonObject> action)
         {
             this.request(route, emptyMsg, action);

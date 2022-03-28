@@ -61,7 +61,7 @@ namespace Pomelo.DotNetClient.Test
             int num = 10;
             int limit = 1000;
 
-            Transporter tc = new Transporter(null, process);
+            KcpTransporter tc = new KcpTransporter(null, null, null, process);
 
             List<byte[]> list;
 
