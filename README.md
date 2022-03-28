@@ -21,7 +21,7 @@ Initialize pomelo client
 using namespace Pomelo.DotNetClient
 string host="127.0.0.1";//(www.xxx.com/127.0.0.1/::1/localhost etc.)
 int port=3014;
-PomeloClient pclient = new PomeloClient();
+var pclient = new PomeloTcpClient();
 
 //listen on network state changed event
 pclient.NetWorkStateChangedEvent += (state) =>
@@ -39,6 +39,29 @@ pclient.initClient(host, port, () =>
     });
 });
 
+```
+```c#
+using namespace Pomelo.DotNetClient
+string host="127.0.0.1";//(www.xxx.com/127.0.0.1/::1/localhost etc.)
+int port=3014;
+var kcp = new PomeloKcpClient();
+kcp.NetWorkStateChangedEvent += (state) =>
+{
+    Console.WriteLine(state);
+};
+
+var param = new KcpClientParam(
+    host, port, conv: 123, nodelay: 1, interval: 20, resend: 2, nc: 1,
+    sndwnd: 64, rcvwnd: 64, mtu: 1400
+);
+kcp.initClient(param, () =>
+{
+    kcp.connect(null, data =>
+    {
+        // Console.WriteLine("on data back" + data.ToString());
+        Entry();
+    });
+});
 ```
 
 Use request and response
