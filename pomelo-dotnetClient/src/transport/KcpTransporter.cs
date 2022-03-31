@@ -15,6 +15,7 @@ namespace Pomelo.DotNetClient
 
         public KcpTransporter(Socket socket, KcpClientParam param, IPEndPoint ipEndPoint, Action<byte[]> processer): base(socket, processer)
         {
+            stateObject = new StateObject(65535); // 64KB UDP不会对发送的包进行自动分组，一次发多大，就接收多大，所以要设置的尽量大，否则会报错，无法接收
             this.ipEndPoint = ipEndPoint;
 
             if (param != null) { 
@@ -34,6 +35,16 @@ namespace Pomelo.DotNetClient
                     while (true)
                     {
                         kcp.Update(DateTime.UtcNow);
+
+                        int len;
+                        while ((len = kcp.PeekSize()) > 0)
+                        {
+                            var buffer = new byte[len];
+                            if (kcp.Recv(buffer) >= 0)
+                            {
+                                processBytes(buffer, 0, buffer.Length);
+                            }
+                        }
                         await Task.Delay(5);
                     }
                 }
@@ -76,13 +87,6 @@ namespace Pomelo.DotNetClient
 
                     // var buff = buffer.Memory.Slice(0, avalidLength);
                     kcp.Input(state.buffer.AsSpan());
-                    int len = kcp.PeekSize();
-                    if (len > 0)
-                    {
-                        var recvBuffer = new byte[len];
-                        length = kcp.Recv(recvBuffer);
-                        processBytes(recvBuffer, 0, length);
-                    }
                     // processBytes(state.buffer, 0, length);
                     //Receive next message
                     if (this.transportState != TransportState.closed) receive();

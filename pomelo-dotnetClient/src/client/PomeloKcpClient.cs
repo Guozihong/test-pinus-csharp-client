@@ -60,8 +60,7 @@ namespace Pomelo.DotNetClient
         /// <param name="callback">socket successfully connected callback(in network thread)</param>
         public void initClient(KcpClientParam param, Action<JsonObject> callback = null)
         {
-            SetHostAndPort(param.host, param.port);
-
+            sendIpEndPoint = new IPEndPoint(IPAddress.Parse(param.host), param.port);
             timeoutEvent.Reset();
             NetWorkChanged(NetWorkState.CONNECTING);
 
@@ -82,17 +81,6 @@ namespace Pomelo.DotNetClient
                     NetWorkChanged(NetWorkState.TIMEOUT);
                     Dispose();
                 }
-            }
-        }
-
-        public void SetHostAndPort(string host, int port)
-        {
-            if (sendIpEndPoint == null) {
-                sendIpEndPoint = new IPEndPoint(IPAddress.Parse(host), port);
-            } else
-            {
-                sendIpEndPoint.Address = IPAddress.Parse(host);
-                sendIpEndPoint.Port = port;
             }
         }
     }

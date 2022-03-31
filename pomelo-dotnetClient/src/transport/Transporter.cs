@@ -11,7 +11,7 @@ namespace Pomelo.DotNetClient
         protected Action<byte[]> messageProcesser;
 
         //Used for get message
-        protected StateObject stateObject = new StateObject(1024);
+        protected StateObject stateObject;
         protected TransportState transportState;
         protected IAsyncResult asyncReceive;
         protected IAsyncResult asyncSend;

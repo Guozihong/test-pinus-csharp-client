@@ -7,6 +7,7 @@ namespace Pomelo.DotNetClient.Test
     public class ClientTest
     {
         public static PomeloClient pc = null;
+        private static int n = 0;
 
         public static void kcpTest(string host, int port)
         {
@@ -19,13 +20,33 @@ namespace Pomelo.DotNetClient.Test
             };
 
             var param = new KcpClientParam(
-                host, port, conv: 123, nodelay: 1, interval: 20, resend: 2, nc: 1,
-                sndwnd: 64, rcvwnd: 64, mtu: 1400
+                host, port, conv: 123, nodelay: 1, interval: 20,
+                resend: 2, nc: 1, sndwnd: 64, rcvwnd: 64, mtu: 1400
             );
+            kcp.on("onChat", (data) =>
+            {
+                Console.WriteLine("onChat：" + data.ToString());
+            });
             kcp.initClient(param, data =>
             {
                 // Console.WriteLine("on data back" + data.ToString());
-                Entry();
+                Task.Run(async delegate
+                {
+                    while (true) { 
+                        n ++;
+                        //if (n == 3)
+                        //{
+                        //    param.host = "127.0.0.1";
+                        //    param.port = 3010;
+                        //    kcp.disconnect();
+                        //    kcp.initClient(param, data2 => {
+                        //        Console.WriteLine("连接切换成功！");
+                        //    });
+                        //}
+                        Entry();
+                        await Task.Delay(3000);
+                    }
+                });
             });
         }
 
@@ -42,7 +63,14 @@ namespace Pomelo.DotNetClient.Test
             tcp.initClient(host, port, data =>
             {
                 // Console.WriteLine("on data back" + data.ToString());
-                Entry();
+                Task.Run(async delegate
+                {
+                    while (true)
+                    {
+                        Entry();
+                        await Task.Delay(3000);
+                    }
+                });
             });
         }
 
@@ -89,12 +117,6 @@ namespace Pomelo.DotNetClient.Test
         public static void OnEnter(JsonObject result)
         {
             Console.WriteLine("on login " + result.ToString());
-
-            Task.Run(async delegate
-            {
-                await Task.Delay(3000);
-                Entry();
-            });
         }
 
         public static void onDisconnect(JsonObject result)
@@ -104,11 +126,11 @@ namespace Pomelo.DotNetClient.Test
 
         public static void Run()
         {
-            string host = "192.168.10.204";
+            string host = "118.25.97.56";
             int port = 3010;
 
-            //kcpTest(host, port);
-            tcpTest(host, port);
+            kcpTest(host, port);
+            // tcpTest(host, port);
         }
     }
 }
