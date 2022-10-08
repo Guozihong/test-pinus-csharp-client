@@ -45,7 +45,7 @@ namespace Pomelo.DotNetClient
         protected Socket socket;
         protected Protocol protocol;
         protected bool disposed = false;
-        protected uint reqId = 1;
+        protected uint reqId = 0;
 
         protected ManualResetEvent timeoutEvent = new ManualResetEvent(false);
         protected int timeoutMSec = 8000;    //connect timeout count in millisecond
@@ -182,10 +182,9 @@ namespace Pomelo.DotNetClient
 
         public void request(string route, JsonObject msg, Action<JsonObject> action)
         {
+            reqId++;
             this.eventManager.AddCallBack(reqId, action);
             protocol.send(route, reqId, msg);
-
-            reqId++;
         }
 
         public void notify(string route, JsonObject msg)
